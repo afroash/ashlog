@@ -6,7 +6,7 @@ import (
 )
 
 // logMessage is a helper function that formats the message with an optional error
-func logMessage(level, message string, err interface{}) string {
+func logMessage(level, message string, err error) string {
 	if err != nil {
 		return fmt.Sprintf("%s: %s - %v", level, message, err)
 	}
@@ -14,37 +14,29 @@ func logMessage(level, message string, err interface{}) string {
 }
 
 // LogInfo logs a message at the info level. Useful for debugging.
-func LogInfo(message string, args ...interface{}) {
-	var err interface{}
-	if len(args) > 0 {
-		err = args[0]
-	}
-	log.Print(logMessage("INFO", message, err))
+func LogInfo(message string, err ...error) {
+	log.Print(logMessage("INFO", message, getError(err)))
 }
 
 // LogError logs a message at the error level. Use for logging errors.
-func LogError(message string, args ...interface{}) {
-	var err interface{}
-	if len(args) > 0 {
-		err = args[0]
-	}
-	log.Print(logMessage("ERROR", message, err))
+func LogError(message string, err ...error) {
+	log.Print(logMessage("ERROR", message, getError(err)))
 }
 
 // LogWarn logs a message at the warn level. Use for logging warnings.
-func LogWarn(message string, args ...interface{}) {
-	var err interface{}
-	if len(args) > 0 {
-		err = args[0]
-	}
-	log.Print(logMessage("WARN", message, err))
+func LogWarn(message string, err ...error) {
+	log.Print(logMessage("WARN", message, getError(err)))
 }
 
 // LogFatal logs a message at the fatal level. Use for logging fatal errors and exiting the program.
-func LogFatal(message string, args ...interface{}) {
-	var err interface{}
-	if len(args) > 0 {
-		err = args[0]
+func LogFatal(message string, err ...error) {
+	log.Fatal(logMessage("FATAL", message, getError(err)))
+}
+
+// getError is a helper function to safely get the error from the variadic parameter
+func getError(err []error) error {
+	if len(err) > 0 {
+		return err[0]
 	}
-	log.Fatal(logMessage("FATAL", message, err))
+	return nil
 }
